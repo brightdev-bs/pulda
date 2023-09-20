@@ -1,0 +1,34 @@
+services:
+  mysql:
+    container_name: mysql-for-pulda
+    image: mysql:8.0.30
+    ports:
+      - "3306:3306"
+    volumes:
+      - ../db/:/var/lib/mysql
+    environment:
+      - MYSQL_DATABASE=pulda
+      - MYSQL_USER=local
+      - MYSQL_PASSWORD=localpassword
+      - MYSQL_ROOT_PASSWORD=localpassword
+    networks:
+      - pulda
+  pulda-backend:
+    container_name: pulda-backend
+    build:
+      context: ../pulda
+      dockerfile: Dockerfile
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/pulda?characterEncoding=UTF-8
+      SPRING_DATASOURCE_USERNAME: local
+      SPRING_DATASOURCE_PASSWORD: localpassword
+    ports:
+      - 8088:8088
+    restart: always
+    depends_on:
+      - mysql
+    networks:
+      - pulda
+
+networks:
+  pulda:
